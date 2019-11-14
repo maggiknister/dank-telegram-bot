@@ -1,7 +1,8 @@
-let express = require('express')
-let app = express()
-let bodyParser = require('body-parser')
-const axios = require('axios')
+import bodyParser from 'body-parser';
+import express from 'express';
+
+let app = express();
+const axios = require('axios');
 
 app.use(bodyParser.json()) // for parsing application/json
 app.use(
@@ -9,6 +10,18 @@ app.use(
     extended: true
   })
 ) // for parsing application/x-www-form-urlencoded
+
+function readTextFile(file, callback) {
+  var rawFile = new XMLHttpRequest();
+  rawFile.overrideMimeType("application/json");
+  rawFile.open("GET", file, true);
+  rawFile.onreadystatechange = function() {
+      if (rawFile.readyState === 4 && rawFile.status == "200") {
+          callback(rawFile.responseText);
+      }
+  }
+  rawFile.send(null);
+}
 
 //This is the route the API will call
 app.post('/new-message', function(req, res) {
@@ -21,12 +34,18 @@ app.post('/new-message', function(req, res) {
     return res.end()
   }
 
+let data;
+readTextFile("settings.json", function(text){
+    data = JSON.parse(text);
+});
+data.token
+
   // If we've gotten this far, it means that we have received a message containing the word "marco".
   // Respond by hitting the telegram bot API and responding to the approprite chat_id with the word "Polo!!"
   // Remember to use your own API toked instead of the one below  "https://api.telegram.org/bot<your_api_token>/sendMessage"
   axios
     .post(
-      'https://api.telegram.org/bot777845702:AAFdPS_taJ3pTecEFv2jXkmbQfeOqVZGER/sendMessage',
+      `https://api.telegram.org/bot${data.token}/sendMessage`,
       {
         chat_id: message.chat.id,
         text: 'Polo!!'

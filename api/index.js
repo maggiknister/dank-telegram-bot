@@ -1,5 +1,7 @@
-import bodyParser from 'body-parser';
-import express from 'express';
+let bodyParser = require('body-parser');
+let fs = require('fs');
+let express = require('express');
+
 
 let app = express();
 const axios = require('axios');
@@ -11,21 +13,13 @@ app.use(
   })
 ) // for parsing application/x-www-form-urlencoded
 
-function readTextFile(file, callback) {
-  var rawFile = new XMLHttpRequest();
-  rawFile.overrideMimeType("application/json");
-  rawFile.open("GET", file, true);
-  rawFile.onreadystatechange = function() {
-      if (rawFile.readyState === 4 && rawFile.status == "200") {
-          callback(rawFile.responseText);
-      }
-  }
-  rawFile.send(null);
-}
+let settingsJson = fs.readFileSync('api/settings.json');
+let data = JSON.parse(settingsJson);
 
 //This is the route the API will call
 app.post('/new-message', function(req, res) {
   const { message } = req.body
+  console.log(message);
 
   //Each message contains "text" and a "chat" object, which has an "id" which is the chat id
 
@@ -34,11 +28,6 @@ app.post('/new-message', function(req, res) {
     return res.end()
   }
 
-let data;
-readTextFile("settings.json", function(text){
-    data = JSON.parse(text);
-});
-data.token
 
   // If we've gotten this far, it means that we have received a message containing the word "marco".
   // Respond by hitting the telegram bot API and responding to the approprite chat_id with the word "Polo!!"

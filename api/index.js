@@ -2,57 +2,67 @@ let bodyParser = require('body-parser');
 let fs = require('fs');
 let express = require('express');
 
-
 let app = express();
 const axios = require('axios');
 
-app.use(bodyParser.json()) // for parsing application/json
+let SetupManager = require('./setup');
+
+SetupManager.initializeWebhook();
+
+app.use(bodyParser.json())
 app.use(
   bodyParser.urlencoded({
     extended: true
   })
-) // for parsing application/x-www-form-urlencoded
+)
 
 let settingsJson = fs.readFileSync('api/settings.json');
-let data = JSON.parse(settingsJson);
+let settings = JSON.parse(settingsJson);
 
-//This is the route the API will call
-app.post('/new-message', function(req, res) {
-  const { message } = req.body
-  console.log(message);
+//TODO use baseurl with bot token for security reasons
+let baseUrl = `/${settings.token}`;
 
-  //Each message contains "text" and a "chat" object, which has an "id" which is the chat id
+app.get('/test', (req, res) => {
+  console.log(req);
+  res.send("test");
+})
+
+app.post('/newMessage', (req, res) => {
+  console.log('Message received:\n', req.body);
+  res.send(req.body);
+  let { message } = req.body;
+   //Each message contains "text" and a "chat" object, which has an "id" which is the chat id
+
+  if (message.entities[0].type === 'bot_command') {
+    console.log("The guy send a command!");
+    console.log(message.entities);
+  }
 
   if (!message || message.text.toLowerCase().indexOf('marco') < 0) {
-    // In case a message is not present, or if our message does not have the word marco in it, do nothing and return an empty response
     return res.end()
   }
 
-
   // If we've gotten this far, it means that we have received a message containing the word "marco".
   // Respond by hitting the telegram bot API and responding to the approprite chat_id with the word "Polo!!"
-  // Remember to use your own API toked instead of the one below  "https://api.telegram.org/bot<your_api_token>/sendMessage"
-  axios
-    .post(
-      `https://api.telegram.org/bot${data.token}/sendMessage`,
-      {
+  axios.post(`https://api.telegram.org/bot${settings.token}/sendMessage`,
+    {
         chat_id: message.chat.id,
         text: 'Polo!!'
       }
-    )
-    .then(response => {
+    ).then(response => {
       // We get here if the message was successfully posted
-      console.log('Message posted')
+      console.log('Message to user posted')
       res.end('ok')
-    })
-    .catch(err => {
+    }).catch(err => {
       // ...and here if it was not
       console.log('Error :', err)
       res.end('Error :' + err)
     })
+
 })
 
 // Finally, start our server
-app.listen(3000, () => {
-  console.log('Telegram app listening on port 3000!')
+let port = 8443;
+app.listen(port, () => {
+  console.log(`Telegram app listening on port ${port}!`)
 })

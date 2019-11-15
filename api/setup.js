@@ -1,5 +1,6 @@
 const axios = require('axios');
 const fs = require('fs');
+const settings = require('./settings/settings');
 
 class SetupManager {
   constructor() {
@@ -7,8 +8,6 @@ class SetupManager {
   }
 
   async initializeWebhook() {
-    let json = fs.readFileSync('api/settings.json');
-    let settings = JSON.parse(json);
 
     // curl -F "url=https://d97237c7.ngrok.io/new-message"  https://api.telegram.org/bot995732400:AAFXS9YYf304WzZy_u1HDsZ-wsgAnBvAXlI/setWebhook
     try {

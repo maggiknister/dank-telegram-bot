@@ -1,11 +1,11 @@
 let bodyParser = require('body-parser');
 let fs = require('fs');
 let express = require('express');
-
 let app = express();
-const axios = require('axios');
-
+let axios = require('axios');
 let SetupManager = require('./setup');
+let CommandHandler = require('./CommandHandler');
+let settings = require('./settings/settings');
 
 SetupManager.initializeWebhook();
 
@@ -15,9 +15,6 @@ app.use(
     extended: true
   })
 )
-
-let settingsJson = fs.readFileSync('api/settings.json');
-let settings = JSON.parse(settingsJson);
 
 //TODO use baseurl with bot token for security reasons
 let baseUrl = `/${settings.token}`;
@@ -33,9 +30,9 @@ app.post('/newMessage', (req, res) => {
   let { message } = req.body;
    //Each message contains "text" and a "chat" object, which has an "id" which is the chat id
 
-  if (message.entities[0].type === 'bot_command') {
-    console.log("The guy send a command!");
-    console.log(message.entities);
+  if (checkCommandInstance(message, '/help')) {
+    CommandHandler.helpCommand(req, res, message);
+    return;
   }
 
   if (!message || message.text.toLowerCase().indexOf('marco') < 0) {
@@ -60,6 +57,23 @@ app.post('/newMessage', (req, res) => {
     })
 
 })
+
+let checkCommand = message => {
+  let { entities } = message;
+  if (entities && entities[0].type === 'bot_command') {
+    console.log("The guy send a command!");
+    return true;
+  }
+  return false;
+}
+
+let checkCommandInstance = (message, commandString) => {
+  let { entities } = message;
+  if (entities && entities[0].type === 'bot_command' && message.text === commandString) {
+    return true;
+  }
+  return false;
+}
 
 // Finally, start our server
 let port = 8443;

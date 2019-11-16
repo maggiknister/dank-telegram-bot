@@ -1,9 +1,0 @@
-class RedditManager{
-  constructor() {
-
-  }
-
-  getDankestMemeToday() {
-    
-  }
-}

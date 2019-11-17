@@ -5,7 +5,7 @@ const ApiManager = require('./ApiManager');
 const bot = new Telegraf(settings.token);
 
 const startBot = () => {
-  bot.start((ctx) => ctx.reply('Willkommen beim DankMemes-Bot'));
+  bot.start((ctx) => ctx.reply('Willkommen beim DankMemes-Bot\n/dankestMeme, um das dankeste Meme von heute zu bekommen'));
   bot.help((ctx) => ctx.reply('Hier ist die nicht-existente Hilfe-Seite'));
   bot.command('dankestMeme', (ctx) => {
     ApiManager.getDankestMemeToday(ctx);

@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/usr/bin/node
 let bot = require('./Bot');
 // const SetupManager = require('./setup');
 

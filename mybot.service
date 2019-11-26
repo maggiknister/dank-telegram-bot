@@ -2,7 +2,7 @@
 Description=My Bot
 
 [Service]
-ExecStart=/var/www/dank-telegram-bot/index.js
+ExecStart=/usr/bin/node /var/www/dank-telegram-bot/index.js
 Restart=always
 User=nobody
 # Note Debian/Ubuntu uses 'nogroup', RHEL/Fedora uses 'nobody'

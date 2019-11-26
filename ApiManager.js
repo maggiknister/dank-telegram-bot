@@ -1,8 +1,6 @@
 const snoowrap = require('snoowrap');
 const axios = require('axios');
-const path = require('path');
-const fs = require('fs');
-let settings = require('./settings/settings');
+const settings = require('./settings/settings');
 
 class ApiManager{
 
@@ -25,17 +23,31 @@ class ApiManager{
     }
   }
 
-  async getDankestMemeToday(ctx) {
+  // TODO post ohne bild abfangen, dann link zu diesem schicken
+  async getHottestToday(ctx) {
     try {
-      const postListing = await this.r.getTop('dankmemes', {time: 'day', limit: 1});
-      const post = postListing[0];
-      let imageUrl = post.url;
+      const submissionListing = await this.r.getTop('dankmemes', {time: 'day', limit: 1});
+      const submission = submissionListing[0];
 
-      ctx.replyWithPhoto({url: imageUrl});
-      console.log("Dankest meme sent: ", imageUrl);
+      this.sendImg(ctx, submission);
     } catch (e) {
       console.error(e);
     }
+  }
+
+  async getRandom(ctx) {
+    try {
+      const submission = await this.r.getRandomSubmission('dankmemes')
+      this.sendImg(ctx, submission);
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  sendImg(ctx, submission) {
+    const imgUrl = submission.url;
+    ctx.replyWithPhoto({url: imgUrl});
+    console.log("Sent : ", imgUrl);
   }
 }
 

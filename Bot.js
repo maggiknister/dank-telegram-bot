@@ -1,17 +1,24 @@
 const Telegraf = require('telegraf');
 const settings = require('./settings/settings');
-const ApiManager = require('./ApiManager');
 
-const bot = new Telegraf(settings.token);
+class Bot {
+  constructor() {
+    this.apiManager = require('./ApiManager');
+    this.bot = new Telegraf(settings.token);
+  }
 
-const startBot = () => {
-  bot.start((ctx) => ctx.reply('Willkommen beim DankMemes-Bot\n/dankestMeme, um das dankeste Meme von heute zu bekommen'));
-  bot.help((ctx) => ctx.reply('Hier ist die nicht-existente Hilfe-Seite'));
-  bot.command('dankestMeme', (ctx) => {
-    ApiManager.getDankestMemeToday(ctx);
-  })
-  bot.launch();
-  console.log("Bot has been started");
+  startBot() {
+    this.bot.start((ctx) => ctx.reply('Willkommen beim DankMemes-Bot\n/dankestMeme, um das dankeste Meme von heute zu bekommen'));
+    this.bot.help((ctx) => ctx.reply('Hier ist die nicht-existente Hilfe-Seite'));
+    this.bot.command('dankestmeme', ctx => {
+      this.apiManager.getHottestToday(ctx);
+    });
+    this.bot.command('random', ctx => {
+      this.apiManager.getRandom(ctx);
+    })
+    this.bot.launch();
+    console.log("Bot has been started");
+  }
 }
 
-module.exports = startBot;
+module.exports = new Bot();

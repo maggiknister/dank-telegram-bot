@@ -1,4 +1,4 @@
-let startBot = require('./Bot');
+let bot = require('./Bot');
 // const SetupManager = require('./setup');
 
-startBot();
+bot.startBot();

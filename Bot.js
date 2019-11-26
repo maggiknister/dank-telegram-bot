@@ -15,6 +15,9 @@ class Bot {
     });
     this.bot.command('random', ctx => {
       this.apiManager.getRandom(ctx);
+    });
+    this.bot.command('test', ctx => {
+      this.apiManager.testSendImg(ctx);
     })
     this.bot.launch();
     console.log("Bot has been started");

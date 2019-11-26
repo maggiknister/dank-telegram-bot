@@ -1,6 +1,7 @@
 const snoowrap = require('snoowrap');
 const axios = require('axios');
 const settings = require('./settings/settings');
+const isImgUrl = require('is-image-url');
 
 class ApiManager{
 
@@ -23,7 +24,6 @@ class ApiManager{
     }
   }
 
-  // TODO post ohne bild abfangen, dann link zu diesem schicken
   async getHottestToday(ctx) {
     try {
       const submissionListing = await this.r.getTop('dankmemes', {time: 'day', limit: 1});
@@ -45,9 +45,14 @@ class ApiManager{
   }
 
   sendImg(ctx, submission) {
-    const imgUrl = submission.url;
-    ctx.replyWithPhoto({url: imgUrl});
-    console.log("Sent : ", imgUrl);
+    const { url } = submission;
+    if (url && isImgUrl(url)) {
+      ctx.replyWithPhoto({url});
+      console.log("Sent: ", url);
+    } else {
+      ctx.reply(`Dieser Post ist kein Bild aber vielleicht ja trotzdem witzig: ${url}`);
+      console.log("Sent link: ", url);
+    }
   }
 }
 

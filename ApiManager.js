@@ -21,23 +21,32 @@ class ApiManager{
       });
     } catch (e) {
       console.error('API Setup couldnt be completed');
-    }
+    };
+    this.bot = require('./Bot');
+  }
+
+  async getHottestTodaySubmission() {
+    const submissionListing = await this.r.getTop('dankmemes', {time: 'day', limit: 1});
+    const submission = submissionListing[0];
+    return submission;
   }
 
   async getHottestToday(ctx) {
     try {
-      const submissionListing = await this.r.getTop('dankmemes', {time: 'day', limit: 1});
-      const submission = submissionListing[0];
-
-      this.sendImg(ctx, submission);
+      this.sendImg(ctx, this.getHottestTodaySubmission());
     } catch (e) {
       console.error(e);
     }
   }
 
+  async sendHottestTodayToChat(chatId) {
+    this.bot.bot.telegram.sendPhoto(chatId, this.getHottestToday().url);
+    // this.sendImgByChatId(ctx, chatId, this.getHottestToday());
+  }
+
   async getRandom(ctx) {
     try {
-      const submission = await this.r.getRandomSubmission('dankmemes')
+      const submission = await this.r.getRandomSubmission('dankmemes');
       this.sendImg(ctx, submission);
     } catch (e) {
       console.error(e);
@@ -48,6 +57,17 @@ class ApiManager{
     const { url } = submission;
     if (url && isImgUrl(url)) {
       ctx.replyWithPhoto({url});
+      console.log("Sent: ", url);
+    } else {
+      ctx.reply(`Dieser Post ist kein Bild aber vielleicht ja trotzdem witzig: ${url}`);
+      console.log("Sent link: ", url);
+    }
+  }
+
+  sendImgByChatId(ctx, submission, chatId) {
+    const { url } = submission;
+    if (url && isImgUrl(url)) {
+      ctx.telegram.sendPhoto(chatId, url);
       console.log("Sent: ", url);
     } else {
       ctx.reply(`Dieser Post ist kein Bild aber vielleicht ja trotzdem witzig: ${url}`);

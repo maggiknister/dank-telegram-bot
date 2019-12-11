@@ -1,0 +1,16 @@
+version: '3'
+services:
+  bot:
+    build: .
+    container_name: my-bot
+    networks:
+      - localnet
+    links:
+      - redis
+  redis:
+    image: redis
+    networks:
+      - localnet
+networks:
+  localnet:
+    driver: bridge

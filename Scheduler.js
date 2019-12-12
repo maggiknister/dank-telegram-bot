@@ -17,7 +17,7 @@ class Scheduler {
     const { chat } = telegramCtx;
     const job = await this.subscriberQueue.add({
       name: chat.username ? chat.username : chat.first_name,
-      chatid: chat.id
+      chatId: chat.id
     }, {
       repeat: {
         cron: "* * * * *"
@@ -25,7 +25,7 @@ class Scheduler {
     });
     this.subscriberQueue.process(async (job, done) => {
       console.log("Job is being processed");
-      let { chatId } = job;
+      let { chatId } = job.data;
       this.apiManager.sendHottestTodayToChat(chatId);
       done();
     });

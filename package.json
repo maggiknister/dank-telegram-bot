@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index.js"
+    "start": "node index.js",
+    "debug": "nodemon --watch ./dist --inspect=0.0.0.0:9222 --nolazy ./index.js",
+    "docker-debug": "docker-compose up"
   },
   "repository": {
     "type": "git",

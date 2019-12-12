@@ -26,22 +26,28 @@ class ApiManager{
   }
 
   async getHottestTodaySubmission() {
-    const submissionListing = await this.r.getTop('dankmemes', {time: 'day', limit: 1});
-    const submission = submissionListing[0];
-    return submission;
+    try {
+      const submissionListing = await this.r.getTop('dankmemes', {time: 'day', limit: 1});
+      const submission = submissionListing[0];
+      return submission;
+    } catch (e) {
+      console.error(e);
+      return undefined;
+    }
   }
 
   async getHottestToday(ctx) {
     try {
-      this.sendImg(ctx, this.getHottestTodaySubmission());
+      const submission = await this.getHottestTodaySubmission();
+      this.sendImg(ctx, submission);
     } catch (e) {
       console.error(e);
     }
   }
 
   async sendHottestTodayToChat(chatId) {
-    this.bot.bot.telegram.sendPhoto(chatId, this.getHottestToday().url);
-    // this.sendImgByChatId(ctx, chatId, this.getHottestToday());
+    const { url } = await this.getHottestTodaySubmission();
+    this.bot.bot.telegram.sendPhoto(chatId, url);
   }
 
   async getRandom(ctx) {
@@ -55,24 +61,16 @@ class ApiManager{
 
   sendImg(ctx, submission) {
     const { url } = submission;
-    if (url && isImgUrl(url)) {
-      ctx.replyWithPhoto({url});
-      console.log("Sent: ", url);
-    } else {
-      ctx.reply(`Dieser Post ist kein Bild aber vielleicht ja trotzdem witzig: ${url}`);
-      console.log("Sent link: ", url);
+    if (!url) {
+      ctx.reply("Es gab einen Fehler mit der Kommunikation zur Reddit API");
+      return;
     }
-  }
-
-  sendImgByChatId(ctx, submission, chatId) {
-    const { url } = submission;
-    if (url && isImgUrl(url)) {
-      ctx.telegram.sendPhoto(chatId, url);
-      console.log("Sent: ", url);
-    } else {
-      ctx.reply(`Dieser Post ist kein Bild aber vielleicht ja trotzdem witzig: ${url}`);
-      console.log("Sent link: ", url);
+    if (!isImgUrl(url)) {
+      ctx.reply("Die Reddit API gab kein Bild zurück");
+      return;
     }
+    ctx.replyWithPhoto({url});
+    console.log("Sent: ", url);
   }
 }
 

@@ -4,6 +4,7 @@ const settings = require('./settings/settings');
 class Bot {
   constructor() {
     this.apiManager = require('./ApiManager');
+    this.scheduler = require('./Scheduler');
     this.bot = new Telegraf(settings.token);
   }
 
@@ -16,9 +17,12 @@ class Bot {
     this.bot.command('random', ctx => {
       this.apiManager.getRandom(ctx);
     });
-    this.bot.command('test', ctx => {
-      this.apiManager.testSendImg(ctx);
-    })
+    this.bot.command('subscribe', ctx => {
+      this.scheduler.addSubscriber(ctx);
+    });
+    // this.bot.command('test', ctx => {
+    //   console.log(ctx);
+    // })
     this.bot.launch();
     console.log("Bot has been started");
   }

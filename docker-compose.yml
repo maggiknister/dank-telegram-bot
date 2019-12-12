@@ -1,0 +1,29 @@
+version: '3'
+services:
+  bot:
+    build: .
+    container_name: my-bot
+    networks:
+      - localnet
+    links:
+      - redis
+  debug_bot:
+    build: .
+    container_name: my-debug-bot
+    networks:
+      - localnet
+    links:
+      - redis
+    ports:
+      - "9229:9229"
+    command:
+      - node
+      - "--inspect-brk=0.0.0.0"
+      - "."
+  redis:
+    image: redis
+    networks:
+      - localnet
+networks:
+  localnet:
+    driver: bridge

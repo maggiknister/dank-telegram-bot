@@ -21,23 +21,38 @@ class ApiManager{
       });
     } catch (e) {
       console.error('API Setup couldnt be completed');
+    };
+    this.bot = require('./Bot');
+  }
+
+  async getHottestTodaySubmission() {
+    try {
+      const submissionListing = await this.r.getTop('dankmemes', {time: 'day', limit: 1});
+      const submission = submissionListing[0];
+      return submission;
+    } catch (e) {
+      console.error(e);
+      return undefined;
     }
   }
 
   async getHottestToday(ctx) {
     try {
-      const submissionListing = await this.r.getTop('dankmemes', {time: 'day', limit: 1});
-      const submission = submissionListing[0];
-
+      const submission = await this.getHottestTodaySubmission();
       this.sendImg(ctx, submission);
     } catch (e) {
       console.error(e);
     }
   }
 
+  async sendHottestTodayToChat(chatId) {
+    const { url } = await this.getHottestTodaySubmission();
+    this.bot.bot.telegram.sendPhoto(chatId, url);
+  }
+
   async getRandom(ctx) {
     try {
-      const submission = await this.r.getRandomSubmission('dankmemes')
+      const submission = await this.r.getRandomSubmission('dankmemes');
       this.sendImg(ctx, submission);
     } catch (e) {
       console.error(e);
@@ -46,13 +61,16 @@ class ApiManager{
 
   sendImg(ctx, submission) {
     const { url } = submission;
-    if (url && isImgUrl(url)) {
-      ctx.replyWithPhoto({url});
-      console.log("Sent: ", url);
-    } else {
-      ctx.reply(`Dieser Post ist kein Bild aber vielleicht ja trotzdem witzig: ${url}`);
-      console.log("Sent link: ", url);
+    if (!url) {
+      ctx.reply("Es gab einen Fehler mit der Kommunikation zur Reddit API");
+      return;
     }
+    if (!isImgUrl(url)) {
+      ctx.reply("Die Reddit API gab kein Bild zurück");
+      return;
+    }
+    ctx.replyWithPhoto({url});
+    console.log("Sent: ", url);
   }
 }
 
